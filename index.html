@@ -260,17 +260,17 @@
     <div class="stat-card">
       <div class="stat-label">Overall Uptime</div>
       <div class="stat-value" id="statUptime">—</div>
-      <div class="stat-sub">all services up</div>
+      <div class="stat-sub">all services operational</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Avg Response</div>
       <div class="stat-value" id="statAvg">—</div>
-      <div class="stat-sub">ms over window</div>
+      <div class="stat-sub">ms over last 90 checks</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Incidents</div>
       <div class="stat-value" id="statIncidents">—</div>
-      <div class="stat-sub">degraded checks</div>
+      <div class="stat-sub">checks with issues</div>
     </div>
   </div>
 
@@ -326,10 +326,10 @@
   }
 
   const DETAIL_TEXT = {
-    web:       { ok:'Responding normally',   offline:'Not responding',    degraded:'Slow response'  },
-    ai:        { ok:'Model loaded',          offline:'Offline',           degraded:'Degraded'       },
-    image_gen: { ok:'Generating normally',   offline:'Not responding',    degraded:'Degraded'       },
-    discord:   { ok:'Bot online',            offline:'Bot offline',       degraded:'Degraded'       },
+    web:       { ok:'Responding normally',  offline:'Not responding',       degraded:'Responding slowly'     },
+    ai:        { ok:'Model loaded',         offline:'Model not loaded',     degraded:'Inference degraded'    },
+    image_gen: { ok:'Generating normally',  offline:'ComfyUI unreachable',  degraded:'Generation degraded'   },
+    discord:   { ok:'Bot online',           offline:'Bot disconnected',     degraded:'Intermittent responses' },
   };
 
   function loadHistory()  { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; } }
