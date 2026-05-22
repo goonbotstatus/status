@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Goonbot — Status Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0c0c10;
+      --surface:   #13131c;
+      --surface2:  #1a1a27;
+      --border:    rgba(255,255,255,0.07);
+      --accent:    #7c6ff7;
+      --accent-lo: rgba(124,111,247,0.15);
+      --text:      #e8e8f0;
+      --text-dim:  #6b6b80;
+      --green:     #22c55e;
+      --green-lo:  rgba(34,197,94,0.12);
+      --red:       #ef4444;
+      --red-lo:    rgba(239,68,68,0.12);
+      --amber:     #f59e0b;
+      --amber-lo:  rgba(245,158,11,0.12);
+      --radius:    14px;
+    }
+
+    html, body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 15px; line-height: 1.6; min-height: 100vh;
+    }
+
+    .page { max-width: 640px; margin: 0 auto; padding: 48px 20px 80px; }
+
+    .header { margin-bottom: 36px; }
+    .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: #fff; }
+    .header p  { color: var(--text-dim); margin-top: 2px; font-size: 14px; }
+    .header a  { color: var(--accent); text-decoration: none; font-size: 13px; }
+    .header a:hover { text-decoration: underline; }
+
+    /* Token gate */
+    #tokenGate {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px;
+    }
+    #tokenGate h2 { font-size: 16px; font-weight: 600; margin-bottom: 14px; }
+    #tokenGate p  { font-size: 13.5px; color: var(--text-dim); margin-bottom: 18px; line-height: 1.5; }
+
+    /* Admin panel */
+    #adminPanel { display: none; }
+
+    /* Current status card */
+    .status-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; margin-bottom: 24px;
+    }
+    .status-card h2 { font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--text-dim); margin-bottom: 14px; }
+    .current-override {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .override-info { font-size: 14px; }
+    .override-info strong { color: var(--amber); }
+    .override-type { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+
+    /* Set incident */
+    .set-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; margin-bottom: 24px;
+    }
+    .set-card h2 { font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--text-dim); margin-bottom: 18px; }
+
+    /* Preset buttons */
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .preset-btn {
+      padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text-dim);
+      font-family: inherit; font-size: 13px; cursor: pointer;
+      transition: all .15s;
+    }
+    .preset-btn:hover   { border-color: rgba(255,255,255,.2); color: var(--text); }
+    .preset-btn.active  { background: var(--accent-lo); border-color: var(--accent); color: var(--accent); }
+
+    /* Form fields */
+    .form-group { margin-bottom: 16px; }
+    label { font-size: 12px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;
+      letter-spacing: .07em; display: block; margin-bottom: 7px; }
+
+    input[type=text], input[type=password], input[type=datetime-local], textarea, select {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 9px; color: var(--text); font-family: inherit; font-size: 14px;
+      padding: 10px 14px; outline: none;
+      transition: border-color .15s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+    select option { background: #1a1a27; }
+
+    /* Service overrides */
+    .svc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media(max-width:480px){ .svc-grid { grid-template-columns: 1fr; } }
+    .svc-row { display: flex; flex-direction: column; gap: 5px; }
+    .svc-row label { text-transform: none; font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--text); }
+
+    /* Actions */
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+    .btn {
+      padding: 10px 20px; border-radius: 9px; border: none;
+      font-family: inherit; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: opacity .15s, transform .1s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-danger  { background: var(--red-lo); color: var(--red); border: 1px solid rgba(239,68,68,.3); }
+    .btn-secondary { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(60px);
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 10px; padding: 12px 20px;
+      font-size: 14px; transition: transform .3s ease; z-index: 999;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.ok   { border-color: rgba(34,197,94,.4); color: var(--green); }
+    #toast.err  { border-color: rgba(239,68,68,.4); color: var(--red); }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>Goonbot</h1>
+    <p>Status Admin &nbsp;·&nbsp; <a href="index.html">← Back to status page</a></p>
+  </div>
+
+  <!-- Token gate -->
+  <div id="tokenGate">
+    <h2>Admin Access</h2>
+    <p>Enter your admin token to continue. Find it in <code>status_admin_token.txt</code> on the server, or in the startup logs.</p>
+    <div class="form-group">
+      <label>Admin Token</label>
+      <input type="password" id="tokenInput" placeholder="Paste token here…" autocomplete="off"/>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="verifyToken()">Unlock</button>
+    </div>
+  </div>
+
+  <!-- Admin panel (shown after auth) -->
+  <div id="adminPanel">
+
+    <!-- Current override -->
+    <div class="status-card">
+      <h2>Current Override</h2>
+      <div class="current-override" id="currentOverrideDisplay">
+        <div class="override-info">
+          <div id="overrideStatusText">Loading…</div>
+          <div class="override-type" id="overrideTypeText"></div>
+        </div>
+        <button class="btn btn-danger" id="clearBtn" onclick="clearOverride()" style="display:none">
+          Clear Incident
+        </button>
+      </div>
+    </div>
+
+    <!-- Set incident -->
+    <div class="set-card">
+      <h2>Set Incident</h2>
+
+      <div class="form-group">
+        <label>Incident Type</label>
+        <div class="presets">
+          <button class="preset-btn" data-type="maintenance"     onclick="selectPreset(this)">🔧 Maintenance</button>
+          <button class="preset-btn" data-type="power_outage_id" onclick="selectPreset(this)">⚡ Power Outage (ID'd)</button>
+          <button class="preset-btn" data-type="power_outage_un" onclick="selectPreset(this)">⚡ Power Outage (Unknown)</button>
+          <button class="preset-btn" data-type="network"         onclick="selectPreset(this)">🌐 Network Issues</button>
+          <button class="preset-btn" data-type="hardware"        onclick="selectPreset(this)">💾 Hardware Failure</button>
+          <button class="preset-btn" data-type="custom"          onclick="selectPreset(this)">✏️ Custom</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Message <span style="opacity:.5;font-weight:400;text-transform:none;">(shown publicly)</span></label>
+        <textarea id="incidentMsg" placeholder="Describe the issue for users…"></textarea>
+      </div>
+
+      <hr class="divider"/>
+      <div class="form-group">
+        <label>Per-Service Status <span style="opacity:.5;font-weight:400;text-transform:none;">(optional — leave as Auto to use real health data)</span></label>
+        <div class="svc-grid">
+          <div class="svc-row">
+            <label>Website</label>
+            <select id="svc-web">
+              <option value="">Auto</option>
+              <option value="ok">Operational</option>
+              <option value="degraded">Degraded</option>
+              <option value="offline">Offline</option>
+            </select>
+          </div>
+          <div class="svc-row">
+            <label>AI Inference</label>
+            <select id="svc-ai">
+              <option value="">Auto</option>
+              <option value="ok">Operational</option>
+              <option value="degraded">Degraded</option>
+              <option value="offline">Offline</option>
+            </select>
+          </div>
+          <div class="svc-row">
+            <label>Image Generation</label>
+            <select id="svc-image_gen">
+              <option value="">Auto</option>
+              <option value="ok">Operational</option>
+              <option value="degraded">Degraded</option>
+              <option value="offline">Offline</option>
+            </select>
+          </div>
+          <div class="svc-row">
+            <label>Discord Bot</label>
+            <select id="svc-discord">
+              <option value="">Auto</option>
+              <option value="ok">Operational</option>
+              <option value="degraded">Degraded</option>
+              <option value="offline">Offline</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider"/>
+      <div class="form-group">
+        <label>Estimated Resolution <span style="opacity:.5;font-weight:400;text-transform:none;">(optional)</span></label>
+        <input type="datetime-local" id="incidentExpiry"/>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" onclick="setOverride()">Set Incident</button>
+        <button class="btn btn-secondary" onclick="clearForm()">Clear Form</button>
+      </div>
+    </div>
+
+    <div style="text-align:right; margin-top:16px">
+      <a href="#" onclick="logout();return false;" style="font-size:13px;color:var(--text-dim);">Log out</a>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const OVERRIDE_URL = 'https://goonbot.net/status-admin/override';
+  const TOKEN_KEY    = 'goonbot_admin_token';
+
+  const INC_LABELS = {
+    maintenance:     'Scheduled Maintenance',
+    power_outage_id: 'Power Outage — Identified',
+    power_outage_un: 'Power Outage — Cause Unknown',
+    network:         'Network Disruption',
+    hardware:        'Hardware Failure',
+    custom:          'Custom Incident',
+  };
+
+  const INC_MSGS = {
+    maintenance:     "I'm performing scheduled maintenance. Some services may be temporarily unavailable. I appreciate your patience.",
+    power_outage_id: "I'm currently dealing with a power outage at the hosting location. The cause has been identified and I'm working to restore services.",
+    power_outage_un: "A power disruption is affecting services. I'm still determining the root cause and will post an update as soon as I know more.",
+    network:         "I'm experiencing network connectivity issues that are impacting service availability. This is being actively investigated.",
+    hardware:        "A hardware failure has been detected. I'm working on a fix and will restore services as soon as possible.",
+    custom:          '',
+  };
+
+  let _token = localStorage.getItem(TOKEN_KEY) || '';
+  let _selectedType = '';
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  function toast(msg, type='ok') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'show ' + type;
+    setTimeout(() => el.className = '', 3000);
+  }
+
+  // ── Token verify ──────────────────────────────────────────────────────────
+  async function verifyToken() {
+    const input = document.getElementById('tokenInput').value.trim();
+    if (!input) { toast('Enter a token first', 'err'); return; }
+    try {
+      const r = await fetch(OVERRIDE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${input}` },
+        body: JSON.stringify({ active: false }),  // no-op clear (safe if nothing active)
+      });
+      if (r.status === 401) { toast('Invalid token', 'err'); return; }
+      _token = input;
+      localStorage.setItem(TOKEN_KEY, _token);
+      showPanel();
+    } catch {
+      toast('Could not reach server', 'err');
+    }
+  }
+
+  function showPanel() {
+    document.getElementById('tokenGate').style.display  = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadCurrentOverride();
+  }
+
+  function logout() {
+    localStorage.removeItem(TOKEN_KEY);
+    _token = '';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('tokenGate').style.display  = 'block';
+    document.getElementById('tokenInput').value = '';
+  }
+
+  // ── Load current override ─────────────────────────────────────────────────
+  async function loadCurrentOverride() {
+    try {
+      const r    = await fetch(OVERRIDE_URL, { cache:'no-store' });
+      const data = await r.json();
+      renderCurrentOverride(data);
+    } catch {
+      document.getElementById('overrideStatusText').textContent = 'Could not load';
+    }
+  }
+
+  function renderCurrentOverride(data) {
+    const el   = document.getElementById('overrideStatusText');
+    const type = document.getElementById('overrideTypeText');
+    const btn  = document.getElementById('clearBtn');
+    if (data?.active) {
+      el.innerHTML = '<strong style="color:var(--amber)">Active incident</strong>';
+      type.textContent = (INC_LABELS[data.type] || data.type || '') +
+        (data.message ? ` — "${data.message.slice(0,60)}${data.message.length > 60 ? '…' : ''}"` : '');
+      btn.style.display = '';
+    } else {
+      el.textContent = 'No active override — status reflects real health data.';
+      type.textContent = '';
+      btn.style.display = 'none';
+    }
+  }
+
+  // ── Preset selection ──────────────────────────────────────────────────────
+  function selectPreset(btn) {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    _selectedType = btn.dataset.type;
+    const msgEl = document.getElementById('incidentMsg');
+    if (INC_MSGS[_selectedType] && !msgEl.value) {
+      msgEl.value = INC_MSGS[_selectedType];
+    } else if (!msgEl.value) {
+      msgEl.value = INC_MSGS[_selectedType] || '';
+    }
+  }
+
+  // ── Set override ──────────────────────────────────────────────────────────
+  async function setOverride() {
+    if (!_selectedType) { toast('Select an incident type first', 'err'); return; }
+    const msg     = document.getElementById('incidentMsg').value.trim();
+    const expiry  = document.getElementById('incidentExpiry').value;
+    const svcKeys = ['web','ai','image_gen','discord'];
+    const services = {};
+    svcKeys.forEach(id => {
+      const v = document.getElementById('svc-' + id)?.value;
+      if (v) services[id] = v;
+    });
+
+    const body = {
+      active:   true,
+      type:     _selectedType,
+      message:  msg,
+      services,
+      started:  Math.floor(Date.now()/1000),
+      expires:  expiry ? Math.floor(new Date(expiry).getTime()/1000) : null,
+    };
+
+    try {
+      const r = await fetch(OVERRIDE_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_token}` },
+        body:    JSON.stringify(body),
+      });
+      if (r.status === 401) { toast('Token rejected — log out and re-enter', 'err'); return; }
+      const data = await r.json();
+      if (data.ok) {
+        toast('Incident set — status page will update within 60s', 'ok');
+        renderCurrentOverride(data);
+      } else {
+        toast('Server error', 'err');
+      }
+    } catch {
+      toast('Could not reach server', 'err');
+    }
+  }
+
+  // ── Clear override ────────────────────────────────────────────────────────
+  async function clearOverride() {
+    try {
+      const r = await fetch(OVERRIDE_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_token}` },
+        body:    JSON.stringify({ active: false }),
+      });
+      if (r.status === 401) { toast('Token rejected', 'err'); return; }
+      toast('Incident cleared — status page now shows real data', 'ok');
+      renderCurrentOverride({ active: false });
+    } catch {
+      toast('Could not reach server', 'err');
+    }
+  }
+
+  // ── Clear form ────────────────────────────────────────────────────────────
+  function clearForm() {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    _selectedType = '';
+    document.getElementById('incidentMsg').value    = '';
+    document.getElementById('incidentExpiry').value = '';
+    ['web','ai','image_gen','discord'].forEach(id => {
+      const el = document.getElementById('svc-' + id);
+      if (el) el.value = '';
+    });
+  }
+
+  // ── Auto-login if token cached ────────────────────────────────────────────
+  if (_token) showPanel();
+
+  // Enter key in token input
+  document.getElementById('tokenInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') verifyToken();
+  });
+</script>
+</body>
+</html>

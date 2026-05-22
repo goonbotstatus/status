@@ -2,465 +2,543 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>Goonbot Status</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Goonbot — System Status</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --bg:         #0c0c10;
-      --bg2:        #101015;
-      --surface:    #18181e;
-      --surface2:   #1f1f27;
-      --border:     rgba(255,255,255,.06);
-      --border2:    rgba(255,255,255,.10);
-      --text:       #e8e8f2;
-      --text2:      #9494ab;
-      --text3:      #56566a;
-      --accent:     #7c6ff7;
-      --accent-glow:rgba(124,111,247,.22);
-      --green:      #3dd68c;
-      --green-dim:  rgba(61,214,140,.10);
-      --red:        #f06c6c;
-      --red-dim:    rgba(240,108,108,.10);
-      --amber:      #f5a623;
-      --amber-dim:  rgba(245,166,35,.10);
-      --r-sm:       9px;
-      --r:          13px;
-      --r-lg:       18px;
-      --font:       'DM Sans', sans-serif;
-    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: var(--font);
+    :root {
+      --bg:        #0c0c10;
+      --surface:   #13131c;
+      --surface2:  #1a1a27;
+      --border:    rgba(255,255,255,0.07);
+      --accent:    #7c6ff7;
+      --accent-lo: rgba(124,111,247,0.12);
+      --text:      #e8e8f0;
+      --text-dim:  #6b6b80;
+      --green:     #22c55e;
+      --green-lo:  rgba(34,197,94,0.12);
+      --red:       #ef4444;
+      --red-lo:    rgba(239,68,68,0.12);
+      --amber:     #f59e0b;
+      --amber-lo:  rgba(245,158,11,0.12);
+      --radius:    14px;
+    }
+
+    html, body {
       background: var(--bg);
       color: var(--text);
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0)
-               env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
     }
 
-    /* ── Page shell ───────────────────────────────── */
-    .page {
-      width: 100%;
-      max-width: 680px;
-      padding: 48px 24px 80px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
+    .page { max-width: 800px; margin: 0 auto; padding: 48px 20px 80px; }
 
-    /* ── Header ───────────────────────────────────── */
-    header { display: flex; flex-direction: column; gap: 4px; }
-    .logo {
-      font-size: 1.55rem;
-      font-weight: 700;
-      letter-spacing: -.03em;
-      color: var(--text);
-    }
-    .logo span { color: var(--accent); }
-    .logo-sub {
-      font-size: .78rem;
-      color: var(--text3);
-      font-weight: 400;
-      letter-spacing: .01em;
-    }
+    /* Header */
+    .header { margin-bottom: 36px; }
+    .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: #fff; }
+    .header p  { color: var(--text-dim); margin-top: 2px; font-size: 14px; }
 
-    /* ── Overall banner ───────────────────────────── */
+    /* Banner */
     .banner {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 20px;
-      border-radius: var(--r-lg);
-      border: 1px solid;
-      transition: background .3s, border-color .3s;
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 18px 20px; border-radius: var(--radius);
+      border: 1px solid var(--border); margin-bottom: 24px;
     }
-    .banner.ok {
-      background: var(--green-dim);
-      border-color: color-mix(in oklab, var(--green) 30%, transparent);
+    .banner.ok      { background: var(--green-lo);  border-color: rgba(34,197,94,0.25); }
+    .banner.degraded{ background: var(--red-lo);    border-color: rgba(239,68,68,0.25); }
+    .banner.incident{ background: var(--amber-lo);  border-color: rgba(245,158,11,0.25); }
+    .banner-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+    .banner.ok       .banner-dot { background:var(--green); animation:pulse-g 2s infinite; }
+    .banner.degraded .banner-dot { background:var(--red); }
+    .banner.incident .banner-dot { background:var(--amber); animation:pulse-a 2s infinite; }
+    @keyframes pulse-g { 0%,100%{box-shadow:0 0 4px var(--green)} 50%{box-shadow:0 0 12px var(--green)} }
+    @keyframes pulse-a { 0%,100%{box-shadow:0 0 4px var(--amber)} 50%{box-shadow:0 0 12px var(--amber)} }
+    .banner-body { flex:1; }
+    .banner-title  { font-weight:600; font-size:15px; }
+    .banner-msg    { font-size:13.5px; color:var(--text-dim); margin-top:3px; line-height:1.5; }
+    .banner-latency{ font-size:12px; color:var(--text-dim); margin-top:6px; opacity:.7; }
+
+    /* Incident box */
+    .incident-box {
+      background: var(--surface); border: 1px solid rgba(245,158,11,0.3);
+      border-radius: var(--radius); padding: 18px 20px; margin-bottom: 24px;
+      display: none;
     }
-    .banner.degraded {
-      background: var(--red-dim);
-      border-color: color-mix(in oklab, var(--red) 30%, transparent);
+    .incident-box.visible { display: block; }
+    .incident-box h3 {
+      font-size:11px; font-weight:600; text-transform:uppercase;
+      letter-spacing:.08em; color:var(--amber); margin-bottom:12px;
     }
-    .banner.loading {
-      background: var(--surface);
-      border-color: var(--border2);
-    }
-    .banner-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .banner.ok    .banner-dot { background: var(--green); box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 25%, transparent); }
-    .banner.degraded .banner-dot { background: var(--red);   box-shadow: 0 0 0 3px color-mix(in oklab, var(--red)   25%, transparent); }
-    .banner.loading .banner-dot { background: var(--text3); }
-    .banner-text { display: flex; flex-direction: column; gap: 2px; }
-    .banner-title {
-      font-size: .95rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .banner-sub {
-      font-size: .75rem;
-      color: var(--text2);
-      line-height: 1.5;
+    .incident-row { display:flex; gap:12px; margin-top:6px; font-size:13.5px; }
+    .incident-label { color:var(--text-dim); min-width:110px; flex-shrink:0; }
+    .incident-value { color:var(--text); }
+
+    /* Section heading */
+    .section-head {
+      font-size:11px; font-weight:600; text-transform:uppercase;
+      letter-spacing:.1em; color:var(--text-dim); margin-bottom:14px;
     }
 
-    /* ── Service grid ─────────────────────────────── */
-    .section-label {
-      font-size: .7rem;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--text3);
-      margin-bottom: -16px;
-    }
-    .services {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 480px) { .services { grid-template-columns: 1fr; } }
+    /* Services grid */
+    .services-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:36px; }
+    @media(max-width:520px){ .services-grid { grid-template-columns:1fr; } }
 
-    .svc {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      padding: 18px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transition: border-color .25s;
+    .card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:18px 18px 16px;
+      transition:border-color .2s;
     }
-    .svc:hover { border-color: var(--border2); }
-
-    .svc-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-    .svc-name {
-      font-size: .85rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .svc-icon {
-      width: 28px; height: 28px;
-      border-radius: var(--r-sm);
-      background: var(--surface2);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .svc-icon svg { width: 14px; height: 14px; color: var(--text2); }
+    .card:hover { border-color:rgba(255,255,255,0.14); }
+    .card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+    .card-icon { font-size:18px; line-height:1; }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-size: .7rem;
-      font-weight: 600;
-      letter-spacing: .02em;
+      font-size:11px; font-weight:600; letter-spacing:.04em;
+      padding:3px 9px; border-radius:20px; text-transform:uppercase;
     }
-    .badge::before {
-      content: '';
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .badge.ok       { background: var(--green-dim); color: var(--green); }
-    .badge.ok::before { background: var(--green); }
-    .badge.offline  { background: var(--red-dim);   color: var(--red);   }
-    .badge.offline::before { background: var(--red); }
-    .badge.degraded { background: var(--amber-dim); color: var(--amber); }
-    .badge.degraded::before { background: var(--amber); }
-    .badge.loading  { background: var(--surface2); color: var(--text3); }
-    .badge.loading::before { background: var(--text3); }
+    .badge.ok       { background:var(--green-lo); color:var(--green); }
+    .badge.offline  { background:var(--red-lo);   color:var(--red);   }
+    .badge.degraded { background:var(--amber-lo); color:var(--amber); }
+    .badge.loading  { background:rgba(255,255,255,.06); color:var(--text-dim); }
 
-    .svc-detail {
-      font-size: .72rem;
-      color: var(--text3);
-      line-height: 1.5;
-    }
+    .card-name   { font-weight:600; font-size:15px; margin-bottom:2px; }
+    .card-detail { font-size:12.5px; color:var(--text-dim); min-height:18px; }
 
-    /* ── Footer ───────────────────────────────────── */
-    footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    /* Uptime dots */
+    .uptime-bar {
+      display:flex; gap:2px; margin-top:14px;
+      align-items:center; overflow:hidden;
     }
-    .footer-meta {
-      font-size: .72rem;
-      color: var(--text3);
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+    .uptime-dot {
+      flex:1; min-width:0; height:20px; border-radius:3px;
+      background:var(--surface2); cursor:default;
+      transition:opacity .15s; position:relative;
     }
-    .refresh-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: var(--r-sm);
-      color: var(--text2);
-      font-family: var(--font);
-      font-size: .72rem;
-      font-weight: 500;
-      padding: 6px 12px;
-      cursor: pointer;
-      transition: border-color .15s, color .15s;
-    }
-    .refresh-btn:hover { border-color: var(--accent); color: var(--text); }
-    .refresh-btn svg { width: 11px; height: 11px; }
-    .refresh-btn.spinning svg { animation: spin .7s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .uptime-dot.ok       { background:var(--green); opacity:.7; }
+    .uptime-dot.offline  { background:var(--red);   opacity:.85; }
+    .uptime-dot.degraded { background:var(--amber); opacity:.7; }
+    .uptime-dot:hover    { opacity:1 !important; }
+    .uptime-pct { font-size:11px; color:var(--text-dim); margin-top:6px; }
 
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    /* Chart */
+    .chart-section {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:20px 20px 16px; margin-bottom:36px;
+    }
+    .chart-header {
+      display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px;
+    }
+    .chart-title   { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); }
+    .chart-current { font-size:22px; font-weight:700; color:#fff; }
+    .chart-unit    { font-size:13px; font-weight:400; color:var(--text-dim); margin-left:3px; }
+    canvas#rtChart { width:100%; height:72px; display:block; }
+
+    /* Stats */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:36px; }
+    @media(max-width:480px){ .stats-row { grid-template-columns:1fr 1fr; } }
+    .stat-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:16px 18px;
+    }
+    .stat-label { font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:6px; }
+    .stat-value { font-size:24px; font-weight:700; color:#fff; letter-spacing:-0.5px; }
+    .stat-sub   { font-size:12px; color:var(--text-dim); margin-top:2px; }
+
+    /* Footer */
+    .footer {
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:10px;
+      padding-top:24px; border-top:1px solid var(--border);
+      font-size:13px; color:var(--text-dim);
+    }
+    .footer a { color:var(--accent); text-decoration:none; }
+    .footer a:hover { text-decoration:underline; }
+
+    .btn-refresh {
+      display:flex; align-items:center; gap:6px;
+      background:var(--surface2); border:1px solid var(--border);
+      color:var(--text); border-radius:8px; padding:7px 14px;
+      font-family:inherit; font-size:13px; cursor:pointer;
+      transition:background .15s, border-color .15s;
+    }
+    .btn-refresh:hover { background:var(--surface); border-color:rgba(255,255,255,.15); }
+    .btn-refresh svg   { transition:transform .4s; }
+    .btn-refresh.spinning svg { animation:spin .5s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .admin-link { font-size:12px; color:var(--text-dim); opacity:.35; text-decoration:none; }
+    .admin-link:hover { opacity:.7; }
   </style>
 </head>
 <body>
 <div class="page">
 
-  <header>
-    <div class="logo">Goon<span>bot</span></div>
-    <div class="logo-sub">System Status</div>
-  </header>
+  <div class="header">
+    <h1>Goonbot</h1>
+    <p>System Status</p>
+  </div>
 
-  <!-- Overall banner -->
-  <div class="banner loading" id="banner">
+  <div class="banner" id="banner">
     <div class="banner-dot"></div>
-    <div class="banner-text">
-      <div class="banner-title" id="banner-title">Checking…</div>
-      <div class="banner-sub"  id="banner-sub"></div>
+    <div class="banner-body">
+      <div class="banner-title"  id="bannerTitle">Checking…</div>
+      <div class="banner-msg"    id="bannerMsg"></div>
+      <div class="banner-latency" id="bannerLatency"></div>
     </div>
   </div>
 
-  <!-- Services -->
-  <div class="section-label">Services</div>
-  <div class="services" id="services">
-
-    <div class="svc" id="svc-web">
-      <div class="svc-header">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-          </svg>
-        </div>
-        <span class="badge loading" id="badge-web">Checking</span>
-      </div>
-      <div class="svc-name">Website</div>
-      <div class="svc-detail" id="detail-web">—</div>
+  <div class="incident-box" id="incidentBox">
+    <h3>Active Incident</h3>
+    <div class="incident-row"><span class="incident-label">Type</span><span class="incident-value" id="incType">—</span></div>
+    <div class="incident-row"><span class="incident-label">Details</span><span class="incident-value" id="incMsg">—</span></div>
+    <div class="incident-row"><span class="incident-label">Started</span><span class="incident-value" id="incStarted">—</span></div>
+    <div class="incident-row" id="incExpiryRow" style="display:none">
+      <span class="incident-label">Est. resolution</span>
+      <span class="incident-value" id="incExpiry">—</span>
     </div>
+  </div>
 
-    <div class="svc" id="svc-ai">
-      <div class="svc-header">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
-          </svg>
-        </div>
-        <span class="badge loading" id="badge-ai">Checking</span>
-      </div>
-      <div class="svc-name">AI Inference</div>
-      <div class="svc-detail" id="detail-ai">—</div>
+  <div class="section-head">Services</div>
+  <div class="services-grid">
+    <div class="card">
+      <div class="card-top"><span class="card-icon">🌐</span><span class="badge loading" id="badge-web">Checking</span></div>
+      <div class="card-name">Website</div>
+      <div class="card-detail" id="detail-web">—</div>
+      <div class="uptime-bar" id="dots-web"></div>
+      <div class="uptime-pct"  id="pct-web"></div>
     </div>
-
-    <div class="svc" id="svc-image_gen">
-      <div class="svc-header">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
-          </svg>
-        </div>
-        <span class="badge loading" id="badge-image_gen">Checking</span>
-      </div>
-      <div class="svc-name">Image Generation</div>
-      <div class="svc-detail" id="detail-image_gen">—</div>
+    <div class="card">
+      <div class="card-top"><span class="card-icon">🤖</span><span class="badge loading" id="badge-ai">Checking</span></div>
+      <div class="card-name">AI Inference</div>
+      <div class="card-detail" id="detail-ai">—</div>
+      <div class="uptime-bar" id="dots-ai"></div>
+      <div class="uptime-pct"  id="pct-ai"></div>
     </div>
-
-    <div class="svc" id="svc-discord">
-      <div class="svc-header">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
-            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.033.055a19.909 19.909 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
-          </svg>
-        </div>
-        <span class="badge loading" id="badge-discord">Checking</span>
-      </div>
-      <div class="svc-name">Discord Bot</div>
-      <div class="svc-detail" id="detail-discord">—</div>
+    <div class="card">
+      <div class="card-top"><span class="card-icon">🖼️</span><span class="badge loading" id="badge-image_gen">Checking</span></div>
+      <div class="card-name">Image Generation</div>
+      <div class="card-detail" id="detail-image_gen">—</div>
+      <div class="uptime-bar" id="dots-image_gen"></div>
+      <div class="uptime-pct"  id="pct-image_gen"></div>
     </div>
-
-  </div><!-- /services -->
-
-  <footer>
-    <div class="footer-meta">
-      <span id="last-checked">Checking now…</span>
-      <span><a href="https://goonbot.net" target="_blank">goonbot.net</a></span>
+    <div class="card">
+      <div class="card-top"><span class="card-icon">💬</span><span class="badge loading" id="badge-discord">Checking</span></div>
+      <div class="card-name">Discord Bot</div>
+      <div class="card-detail" id="detail-discord">—</div>
+      <div class="uptime-bar" id="dots-discord"></div>
+      <div class="uptime-pct"  id="pct-discord"></div>
     </div>
-    <button class="refresh-btn" id="refresh-btn" onclick="check()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="refresh-icon">
-        <path d="M1 4v6h6"/><path d="M23 20v-6h-6"/>
-        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+  </div>
+
+  <div class="chart-section">
+    <div class="chart-header">
+      <span class="chart-title">Response Time — last 24 checks</span>
+      <span><span class="chart-current" id="currentLatency">—</span><span class="chart-unit">ms</span></span>
+    </div>
+    <canvas id="rtChart"></canvas>
+  </div>
+
+  <div class="section-head">Last 90 checks (~90 min window)</div>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Overall Uptime</div>
+      <div class="stat-value" id="statUptime">—</div>
+      <div class="stat-sub">all services up</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Response</div>
+      <div class="stat-value" id="statAvg">—</div>
+      <div class="stat-sub">ms over window</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Incidents</div>
+      <div class="stat-value" id="statIncidents">—</div>
+      <div class="stat-sub">degraded checks</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>
+      <span id="lastChecked">Last checked just now</span><br/>
+      <a href="https://goonbot.net">goonbot.net</a>
+    </div>
+    <button class="btn-refresh" id="btnRefresh" onclick="refresh()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 4 23 10 17 10"></polyline>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
       </svg>
       Refresh
     </button>
-  </footer>
+  </div>
 
-</div><!-- /page -->
+  <div style="margin-top:18px; text-align:right">
+    <a href="admin.html" class="admin-link">admin</a>
+  </div>
 
+</div>
 <script>
-  const HEALTH_URL = 'https://goonbot.net/health';
-  const REFRESH_MS = 60000;
+  const HEALTH_URL   = 'https://goonbot.net/health';
+  const OVERRIDE_URL = 'https://goonbot.net/status-admin/override';
+  const HISTORY_KEY  = 'goonbot_status_v3';
+  const MAX_HISTORY  = 90;
+  const REFRESH_MS   = 60000;
 
-  let _nextRefresh = null;
-  let _checking    = false;
+  let lastTs = null;
+  let tickInterval = null;
 
+  const INC_LABELS = {
+    maintenance:     'Scheduled Maintenance',
+    power_outage_id: 'Power Outage — Identified',
+    power_outage_un: 'Power Outage — Cause Unknown',
+    network:         'Network Disruption',
+    hardware:        'Hardware Failure',
+    custom:          'Service Incident',
+  };
+
+  const INC_MSGS = {
+    maintenance:     "I'm performing scheduled maintenance. Some services may be temporarily unavailable. I appreciate your patience.",
+    power_outage_id: "I'm currently dealing with a power outage at the hosting location. The cause has been identified and I'm working to restore services.",
+    power_outage_un: "A power disruption is affecting services. I'm still determining the root cause and will post an update as soon as I know more.",
+    network:         "I'm experiencing network connectivity issues that are impacting service availability. This is being actively investigated.",
+    hardware:        "A hardware failure has been detected. I'm working on a fix and will restore services as soon as possible.",
+    custom:          '',
+  };
+
+  function autoOutageMsg(downIds) {
+    const nameMap = { web:'Website', ai:'AI Inference', image_gen:'Image Generation', discord:'Discord Bot' };
+    if (!downIds || !downIds.length) return "A service disruption has been detected. I'm looking into it.";
+    const names = downIds.map(id => nameMap[id] || id);
+    return `${names.join(' and ')} ${names.length > 1 ? 'are' : 'is'} currently experiencing issues. I'm investigating.`;
+  }
+
+  const DETAIL_TEXT = {
+    web:       { ok:'Responding normally',   offline:'Not responding',    degraded:'Slow response'  },
+    ai:        { ok:'Model loaded',          offline:'Offline',           degraded:'Degraded'       },
+    image_gen: { ok:'Generating normally',   offline:'Not responding',    degraded:'Degraded'       },
+    discord:   { ok:'Bot online',            offline:'Bot offline',       degraded:'Degraded'       },
+  };
+
+  function loadHistory()   { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; } }
+  function saveHistory(h)  { localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(-MAX_HISTORY))); }
+  function pushEntry(e)    { const h = loadHistory(); h.push(e); saveHistory(h); return h; }
+
+  function renderDots(sid, history) {
+    const el  = document.getElementById('dots-' + sid);
+    const pEl = document.getElementById('pct-'  + sid);
+    if (!el) return;
+    el.innerHTML = '';
+    const padded = Array(Math.max(0, MAX_HISTORY - history.length)).fill(null).concat(history.slice(-MAX_HISTORY));
+    let ok = 0, total = 0;
+    padded.forEach(entry => {
+      const dot = document.createElement('div');
+      dot.className = 'uptime-dot';
+      if (entry) {
+        const st = entry.services?.[sid] || (entry.ok ? 'ok' : 'offline');
+        dot.classList.add(st);
+        if (st === 'ok') ok++;
+        total++;
+        const d = new Date(entry.ts * 1000);
+        dot.title = `${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} — ${st}`;
+      }
+      el.appendChild(dot);
+    });
+    if (pEl && total > 0)
+      pEl.textContent = `${((ok/total)*100).toFixed(1)}% operational`;
+  }
+
+  function drawChart(history) {
+    const canvas = document.getElementById('rtChart');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.offsetWidth, H = 72;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    const entries = history.filter(e => e.ok && typeof e.latency_ms === 'number').slice(-24);
+    if (entries.length < 2) {
+      ctx.fillStyle = 'rgba(255,255,255,0.05)';
+      ctx.fillRect(0, H/2 - 1, W, 2);
+      return;
+    }
+
+    const vals = entries.map(e => e.latency_ms);
+    const maxV = Math.max(...vals, 100), minV = 0;
+    const pts  = vals.map((v, i) => ({
+      x: (i / (vals.length - 1)) * W,
+      y: H - ((v - minV) / (maxV - minV)) * (H - 10) - 5,
+    }));
+
+    // Fill
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, H);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[pts.length-1].x, H);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, 'rgba(124,111,247,0.30)');
+    grad.addColorStop(1, 'rgba(124,111,247,0.02)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = '#7c6ff7'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Dot at end
+    const last = pts[pts.length-1];
+    ctx.beginPath(); ctx.arc(last.x, last.y, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#7c6ff7'; ctx.fill();
+  }
+
+  function renderStats(history) {
+    const h = history.slice(-MAX_HISTORY);
+    if (!h.length) return;
+    const allOk = h.filter(e => e.ok && e.status === 'ok').length;
+    document.getElementById('statUptime').textContent = ((allOk/h.length)*100).toFixed(1) + '%';
+    const lats = h.filter(e => e.ok && typeof e.latency_ms === 'number').map(e => e.latency_ms);
+    if (lats.length) document.getElementById('statAvg').textContent =
+      Math.round(lats.reduce((a,b)=>a+b,0)/lats.length);
+    document.getElementById('statIncidents').textContent = h.filter(e => !e.ok || e.status !== 'ok').length;
+  }
+
+  const BADGE_LABELS = { ok:'Operational', offline:'Offline', degraded:'Degraded', loading:'Checking' };
   function setBadge(id, status) {
     const el = document.getElementById('badge-' + id);
     if (!el) return;
-    const labels = { ok: 'Operational', offline: 'Offline', degraded: 'Degraded', unknown: 'Unknown', loading: 'Checking' };
     el.className = 'badge ' + (status || 'loading');
-    el.textContent = labels[status] || 'Checking';
+    el.textContent = BADGE_LABELS[status] || 'Checking';
   }
-
-  function setDetail(id, text) {
+  function setDetail(id, status) {
     const el = document.getElementById('detail-' + id);
-    if (el) el.textContent = text || '—';
+    if (el) el.textContent = DETAIL_TEXT[id]?.[status] || '—';
   }
-
-  function setBanner(state, title, sub) {
-    const el = document.getElementById('banner');
-    el.className = 'banner ' + state;
-    document.getElementById('banner-title').textContent = title;
-    document.getElementById('banner-sub').textContent   = sub || '';
+  function setBanner(cls, title, msg, latency) {
+    const b = document.getElementById('banner');
+    b.className = 'banner ' + cls;
+    document.getElementById('bannerTitle').textContent   = title;
+    document.getElementById('bannerMsg').textContent     = msg || '';
+    document.getElementById('bannerLatency').textContent = latency || '';
   }
-
-  function setLastChecked(ts) {
-    const el = document.getElementById('last-checked');
-    if (!ts) { el.textContent = 'Never checked'; return; }
-    const ago = Math.round((Date.now() / 1000) - ts);
-    el.textContent = ago < 5
-      ? 'Just checked'
-      : `Last checked ${ago < 60 ? ago + 's' : Math.round(ago/60) + 'm'} ago`;
-  }
-
-  async function check() {
-    if (_checking) return;
-    _checking = true;
-
-    const btn  = document.getElementById('refresh-btn');
-    const icon = document.getElementById('refresh-icon');
-    btn.disabled = true;
-    icon.style.animation = 'spin .7s linear infinite';
-
-    // Reset to loading state
-    ['web','ai','image_gen','discord'].forEach(id => {
-      setBadge(id, 'loading');
-      setDetail(id, '—');
-    });
-    setBanner('loading', 'Checking…', '');
-
-    let data = null;
-    try {
-      const controller = new AbortController();
-      const timeout    = setTimeout(() => controller.abort(), 8000);
-      const t0         = Date.now();
-      const resp       = await fetch(HEALTH_URL, { signal: controller.signal, cache: 'no-store' });
-      clearTimeout(timeout);
-      const ms         = Date.now() - t0;
-      data             = await resp.json();
-      data._fetch_ms   = ms;
-    } catch (e) {
-      // Server unreachable — power out, network down, etc.
-    }
-
-    if (!data) {
-      setBanner('degraded', 'All services unreachable', "I'm aware of this and working to get things back up.");
-      ['web','ai','image_gen','discord'].forEach(id => {
-        setBadge(id, 'offline');
-        setDetail(id, 'Could not reach server');
-      });
-      document.getElementById('last-checked').textContent = 'Check failed · retrying in 60s';
+  function showIncident(override) {
+    const box = document.getElementById('incidentBox');
+    if (!override?.active) { box.classList.remove('visible'); return; }
+    box.classList.add('visible');
+    document.getElementById('incType').textContent    = INC_LABELS[override.type] || override.type || 'Incident';
+    document.getElementById('incMsg').textContent     = override.message || INC_MSGS[override.type] || '—';
+    document.getElementById('incStarted').textContent = override.started
+      ? new Date(override.started * 1000).toLocaleString() : '—';
+    if (override.expires) {
+      document.getElementById('incExpiry').textContent = new Date(override.expires * 1000).toLocaleString();
+      document.getElementById('incExpiryRow').style.display = '';
     } else {
-      const svcs  = data.services || {};
-      const allOk = data.status === 'ok';
-
-      // Overall banner
-      if (allOk) {
-        setBanner('ok', 'All systems operational', `Response time ${data._fetch_ms}ms`);
-      } else {
-        const down = Object.entries(svcs)
-          .filter(([,v]) => v.status !== 'ok')
-          .map(([,v]) => v.label || '')
-          .filter(Boolean)
-          .join(', ');
-        setBanner('degraded', 'Service disruption detected',
-          (down ? down + (down.endsWith('.') ? '' : '.') + ' ' : '') +
-          "I'm on it.");
-      }
-
-      // Per-service badges + details
-      const detailText = {
-        web:       s => s === 'ok' ? `${data._fetch_ms}ms response time` : 'Not responding',
-        ai:        s => s === 'ok' ? 'Models loaded'     : 'Inference unavailable',
-        image_gen: s => s === 'ok' ? 'Queue accepting jobs' : 'Not responding',
-        discord:   s => s === 'ok' ? 'Bot online'        : s === 'unknown' ? 'Status unknown' : 'Bot offline',
-      };
-
-      for (const [id, svc] of Object.entries(svcs)) {
-        setBadge(id, svc.status);
-        setDetail(id, (detailText[id] || (() => ''))(svc.status));
-      }
-
-      setLastChecked(data.ts);
+      document.getElementById('incExpiryRow').style.display = 'none';
     }
-
-    icon.style.animation = '';
-    btn.disabled = false;
-    _checking = false;
-
-    // Schedule next auto-refresh
-    clearTimeout(_nextRefresh);
-    _nextRefresh = setTimeout(check, REFRESH_MS);
-
-    // Live "X seconds ago" ticker
-    tickLastChecked();
   }
 
-  let _lastTs = null;
-  function tickLastChecked() {
-    clearInterval(window._tickInterval);
-    window._tickInterval = setInterval(() => {
-      if (_lastTs) setLastChecked(_lastTs);
-    }, 10000);
+  function startTick() {
+    clearInterval(tickInterval);
+    tickInterval = setInterval(() => {
+      if (!lastTs) return;
+      const sec = Math.round(Date.now()/1000 - lastTs);
+      document.getElementById('lastChecked').textContent =
+        sec < 5 ? 'Last checked just now' :
+        sec < 60 ? `Last checked ${sec}s ago` :
+        `Last checked ${Math.floor(sec/60)}m ago`;
+    }, 3000);
   }
 
-  // Patch setLastChecked to also store the ts for the ticker
-  const _origSetLastChecked = setLastChecked;
-  window.setLastChecked = function(ts) {
-    _lastTs = ts;
-    _origSetLastChecked(ts);
-  };
+  const SERVICES = ['web','ai','image_gen','discord'];
 
-  // Kick off immediately
-  check();
+  async function doFetch() {
+    document.getElementById('btnRefresh').classList.add('spinning');
+    try {
+      const [healthRes, overrideRes] = await Promise.allSettled([
+        fetch(HEALTH_URL,   { cache:'no-store', signal:AbortSignal.timeout(8000) }),
+        fetch(OVERRIDE_URL, { cache:'no-store', signal:AbortSignal.timeout(5000) }),
+      ]);
+
+      let override = { active: false };
+      if (overrideRes.status === 'fulfilled' && overrideRes.value.ok) {
+        try { override = await overrideRes.value.json(); } catch {}
+      }
+      showIncident(override);
+
+      if (healthRes.status === 'rejected' || !healthRes.value.ok) {
+        SERVICES.forEach(id => { setBadge(id,'offline'); setDetail(id,'offline'); });
+        const msg = override.active
+          ? (override.message || INC_MSGS[override.type] || '')
+          : "I'm unable to reach the server. I'm aware of this and working to restore service.";
+        setBanner(override.active ? 'incident' : 'degraded',
+          override.active ? (INC_LABELS[override.type] || 'Incident') : 'All services unreachable',
+          msg, '');
+        const entry = { ts:Math.floor(Date.now()/1000), ok:false, status:'offline',
+          services:Object.fromEntries(SERVICES.map(id=>[id,'offline'])) };
+        const hist = pushEntry(entry);
+        lastTs = entry.ts;
+        SERVICES.forEach(id => renderDots(id, hist));
+        drawChart(hist); renderStats(hist);
+        return;
+      }
+
+      const data = await healthRes.value.json();
+      lastTs = data.ts || Math.floor(Date.now()/1000);
+      const svcs = data.services || {};
+
+      SERVICES.forEach(id => {
+        const st = override.services?.[id] || svcs[id]?.status || 'offline';
+        setBadge(id, st); setDetail(id, st);
+      });
+
+      if (override.active) {
+        setBanner('incident', INC_LABELS[override.type] || 'Incident',
+          override.message || INC_MSGS[override.type] || '', '');
+      } else if (data.status === 'ok') {
+        setBanner('ok', 'All systems operational', '', `${data.latency_ms}ms response time`);
+      } else {
+        const downIds = SERVICES.filter(id => svcs[id]?.status !== 'ok');
+        setBanner('degraded', 'Service disruption detected', autoOutageMsg(downIds), '');
+      }
+
+      const serviceSnapshot = Object.fromEntries(SERVICES.map(id => [id, svcs[id]?.status || 'offline']));
+      const entry = { ts:lastTs, ok:true, latency_ms:data.latency_ms, status:data.status, services:serviceSnapshot };
+      const hist = pushEntry(entry);
+
+      SERVICES.forEach(id => renderDots(id, hist));
+      drawChart(hist); renderStats(hist);
+      document.getElementById('currentLatency').textContent = data.latency_ms ?? '—';
+
+    } catch(err) {
+      setBanner('degraded', 'Check failed', "I'm unable to reach the server at this time.", '');
+    } finally {
+      document.getElementById('btnRefresh').classList.remove('spinning');
+      startTick();
+    }
+  }
+
+  function refresh() { doFetch(); }
+
+  // Seed from cached history on load
+  (function() {
+    const hist = loadHistory();
+    if (!hist.length) return;
+    SERVICES.forEach(id => renderDots(id, hist));
+    drawChart(hist); renderStats(hist);
+    const last = hist[hist.length-1];
+    if (last) { lastTs = last.ts; document.getElementById('currentLatency').textContent = last.latency_ms ?? '—'; }
+  })();
+
+  doFetch();
+  setInterval(doFetch, REFRESH_MS);
+  window.addEventListener('resize', () => drawChart(loadHistory()));
 </script>
 </body>
 </html>
