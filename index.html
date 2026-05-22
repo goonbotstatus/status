@@ -332,9 +332,18 @@
     discord:   { ok:'Bot online',            offline:'Bot offline',       degraded:'Degraded'       },
   };
 
-  function loadHistory()   { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; } }
-  function saveHistory(h)  { localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(-MAX_HISTORY))); }
-  function pushEntry(e)    { const h = loadHistory(); h.push(e); saveHistory(h); return h; }
+  function loadHistory()  { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; } }
+  function saveHistory(h) { localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(-MAX_HISTORY))); }
+  function pushEntry(e) {
+    const h = loadHistory();
+    const last = h[h.length - 1];
+    // Don't push if the last entry is less than 45 s old — prevents reloads
+    // from inflating the history with duplicate back-to-back entries.
+    if (last && (e.ts - last.ts) < 45) return h;
+    h.push(e);
+    saveHistory(h);
+    return h;
+  }
 
   function renderDots(sid, history) {
     const el  = document.getElementById('dots-' + sid);
