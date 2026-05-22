@@ -490,6 +490,13 @@
       }
       showIncident(override);
 
+      if (healthRes.status === 'fulfilled' && healthRes.value.status === 429) {
+        // Rate limited — don't update service cards or history, just show a note
+        setBanner('degraded', 'Status check rate limited',
+          "This page is being refreshed too quickly. Slow down and it'll update on its own.", '');
+        return;
+      }
+
       if (healthRes.status === 'rejected' || !healthRes.value.ok) {
         SERVICES.forEach(id => { setBadge(id,'offline'); setDetail(id,'offline'); });
         const msg = override.active
