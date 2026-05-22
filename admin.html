@@ -78,6 +78,7 @@
     /* Preset buttons */
     .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
     .preset-btn {
+      display: inline-flex; align-items: center; gap: 6px;
       padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
       background: var(--surface2); color: var(--text-dim);
       font-family: inherit; font-size: 13px; cursor: pointer;
@@ -180,12 +181,30 @@
       <div class="form-group">
         <label>Incident Type</label>
         <div class="presets">
-          <button class="preset-btn" data-type="maintenance"     onclick="selectPreset(this)">🔧 Maintenance</button>
-          <button class="preset-btn" data-type="power_outage_id" onclick="selectPreset(this)">⚡ Power Outage (ID'd)</button>
-          <button class="preset-btn" data-type="power_outage_un" onclick="selectPreset(this)">⚡ Power Outage (Unknown)</button>
-          <button class="preset-btn" data-type="network"         onclick="selectPreset(this)">🌐 Network Issues</button>
-          <button class="preset-btn" data-type="hardware"        onclick="selectPreset(this)">💾 Hardware Failure</button>
-          <button class="preset-btn" data-type="custom"          onclick="selectPreset(this)">✏️ Custom</button>
+          <button class="preset-btn" data-type="maintenance" onclick="selectPreset(this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            Maintenance
+          </button>
+          <button class="preset-btn" data-type="power_outage_id" onclick="selectPreset(this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Power Outage (ID'd)
+          </button>
+          <button class="preset-btn" data-type="power_outage_un" onclick="selectPreset(this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Power Outage (Unknown)
+          </button>
+          <button class="preset-btn" data-type="network" onclick="selectPreset(this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+            Network Issues
+          </button>
+          <button class="preset-btn" data-type="hardware" onclick="selectPreset(this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="12" x2="2" y2="12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><line x1="6" y1="16" x2="6.01" y2="16"/><line x1="10" y1="16" x2="10.01" y2="16"/></svg>
+            Hardware Failure
+          </button>
+          <button class="preset-btn" data-type="custom" onclick="selectPreset(this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Custom
+          </button>
         </div>
       </div>
 
