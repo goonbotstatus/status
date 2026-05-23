@@ -360,8 +360,12 @@
       if (entry) {
         const st = entry.services?.[sid] || (entry.ok ? 'ok' : 'offline');
         dot.classList.add(st);
-        if (st === 'ok') ok++;
-        total++;
+        // Don't penalise 'unknown' — it just means the check couldn't reach
+        // the service's own health endpoint, not that the service was down.
+        if (st !== 'unknown') {
+          if (st === 'ok') ok++;
+          total++;
+        }
         const d = new Date(entry.ts * 1000);
         dot.title = `${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} — ${st}`;
       }
