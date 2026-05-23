@@ -360,19 +360,19 @@
   };
 
   const INC_MSGS = {
-    maintenance:     "I'm performing scheduled maintenance. Some services may be temporarily unavailable. I appreciate your patience.",
-    power_outage_id: "I'm currently dealing with a power outage at the hosting location. The cause has been identified and I'm working to restore services.",
-    power_outage_un: "A power disruption is affecting services. I'm still determining the root cause and will post an update as soon as I know more.",
-    network:         "I'm experiencing network connectivity issues that are impacting service availability. This is being actively investigated.",
-    hardware:        "A hardware failure has been detected. I'm working on a fix and will restore services as soon as possible.",
+    maintenance:     "We're doing some maintenance right now. Things might be down or a bit broken — we'll be back shortly.",
+    power_outage_id: "There's a power outage at the server location. We know what's going on and we're working on getting things back up.",
+    power_outage_un: "Something's wrong with the power at the server location and we're still figuring out what. We'll update this as soon as we know more.",
+    network:         "We're having network issues. We're on it.",
+    hardware:        "There's a hardware problem on our end. We're working on a fix.",
     custom:          '',
   };
 
   function autoOutageMsg(downIds) {
     const nameMap = { web:'Website', ai:'AI Inference', image_gen:'Image Generation', discord:'Discord Bot' };
-    if (!downIds || !downIds.length) return "A service disruption has been detected. I'm looking into it.";
+    if (!downIds || !downIds.length) return "We've detected an outage but don't know what's going on yet — we're looking into it.";
     const names = downIds.map(id => nameMap[id] || id);
-    return `${names.join(' and ')} ${names.length > 1 ? 'are' : 'is'} currently experiencing issues. I'm investigating.`;
+    return `${names.join(' and ')} ${names.length > 1 ? 'are' : 'is'} down. We haven't posted an update yet — we're looking into it.`;
   }
 
   const DETAIL_TEXT = {
@@ -572,9 +572,9 @@
 
         const msg = override.active
           ? (override.message || INC_MSGS[override.type] || '')
-          : "The servers appear to be down. Stay tuned for updates.";
+          : "We've detected an outage but don't know what's going on yet — we're looking into it.";
         setBanner(override.active ? 'incident' : 'degraded',
-          override.active ? (INC_LABELS[override.type] || 'Incident') : 'Website unreachable',
+          override.active ? (INC_LABELS[override.type] || 'Incident') : 'Outage detected',
           msg, '');
 
         const svcSnap = {
