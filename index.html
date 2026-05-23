@@ -292,8 +292,9 @@
 
 </div>
 <script>
-  const HEALTH_URL   = 'https://goonbot.net/health';
-  const OVERRIDE_URL = 'https://goonbot.net/status-admin/override';
+  const HEALTH_URL    = 'https://goonbot.net/health';
+  const OVERRIDE_URL  = 'https://goonbot.net/status-admin/override';
+  const BOT_HEALTH_URL = 'https://services.goonbot.net/health'; // bot process, independent of web server
   const HISTORY_KEY  = 'goonbot_status_v3';
   const MAX_HISTORY  = 90;
   const REFRESH_MS   = 60000;
@@ -499,9 +500,23 @@
       }
 
       if (healthRes.status === 'rejected' || !healthRes.value.ok) {
-        // Only the website is confirmed down — we can't speak for the other services
+        // Main web server is down — try the bot's independent health server as fallback
         setBadge('web', 'offline'); setDetail('web', 'offline');
-        ['ai','image_gen','discord'].forEach(id => { setBadge(id,'unknown'); setDetail(id,'unknown'); });
+
+        let botData = null;
+        try {
+          const br = await fetch(BOT_HEALTH_URL, { cache:'no-store', signal:AbortSignal.timeout(5000) });
+          if (br.ok) botData = await br.json();
+        } catch {}
+
+        if (botData) {
+          // Bot is reachable — use its data for ai, image_gen, discord
+          setBadge('ai',        botData.ai        || 'unknown'); setDetail('ai',        botData.ai        || 'unknown');
+          setBadge('image_gen', botData.image_gen || 'unknown'); setDetail('image_gen', botData.image_gen || 'unknown');
+          setBadge('discord',   botData.discord   || 'unknown'); setDetail('discord',   botData.discord   || 'unknown');
+        } else {
+          ['ai','image_gen','discord'].forEach(id => { setBadge(id,'unknown'); setDetail(id,'unknown'); });
+        }
 
         const msg = override.active
           ? (override.message || INC_MSGS[override.type] || '')
@@ -510,8 +525,13 @@
           override.active ? (INC_LABELS[override.type] || 'Incident') : 'Website unreachable',
           msg, '');
 
-        const entry = { ts:Math.floor(Date.now()/1000), ok:false, status:'offline',
-          services:{ web:'offline', ai:'unknown', image_gen:'unknown', discord:'unknown' } };
+        const svcSnap = {
+          web:       'offline',
+          ai:        botData?.ai        || 'unknown',
+          image_gen: botData?.image_gen || 'unknown',
+          discord:   botData?.discord   || 'unknown',
+        };
+        const entry = { ts:Math.floor(Date.now()/1000), ok:false, status:'offline', services:svcSnap };
         const hist = pushEntry(entry);
         lastTs = entry.ts;
         SERVICES.forEach(id => renderDots(id, hist));
